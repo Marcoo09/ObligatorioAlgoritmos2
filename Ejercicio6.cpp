@@ -2,20 +2,22 @@
 #define ROOT 1
 using namespace std;
 
-struct edgeNode {
+struct edgeNode
+{
 	int v;
 	int w;
 	int c;
 };
 
-struct listNode {
+struct listNode
+{
 	int w;
 	int c;
 };
 
-edgeNode* costHeap;
+edgeNode *costHeap;
 
-int* sets;
+int *sets;
 #include <iostream>
 
 int top;
@@ -23,25 +25,29 @@ int numberOfEdges;
 
 int numberOfVertices;
 
-void initalizeSets() {
-	for (int i = 1; i <= numberOfVertices; i++) sets[i] = 0;
+void initalizeSets()
+{
+	for (int i = 1; i <= numberOfVertices; i++)
+		sets[i] = 0;
 }
 
-
-int find(int e) {
-	if (sets[e] == 0) {
+int find(int e)
+{
+	if (sets[e] == 0)
+	{
 		return e;
 	}
-	else {
+	else
+	{
 		sets[e] = find(sets[e]);
 		return sets[e];
 	}
 }
 
-void merge(int e1, int e2) {
+void merge(int e1, int e2)
+{
 	sets[find(e2)] = find(e1);
 }
-
 
 int fatherPosition(int pos)
 {
@@ -117,7 +123,6 @@ void floatUp(int pos)
 			}
 		}
 	}
-
 }
 void insertInHeap(edgeNode newNode)
 {
@@ -139,16 +144,19 @@ void removeMinimum()
 	toSink(ROOT);
 }
 
-int costOfMinimumSpanningTree() {
+int costOfMinimumSpanningTree()
+{
 	int ret = 0;
 	int cont = 0;
-	for (int i = 1; i <= numberOfEdges && cont < numberOfVertices - 1; i++) {
+	for (int i = 1; i <= numberOfEdges && cont < numberOfVertices - 1; i++)
+	{
 		edgeNode min = getMinimum();
 		removeMinimum();
 		int v = min.v;
 		int w = min.w;
 		int c = min.c;
-		if (find(w) != find(v)) {
+		if (find(w) != find(v))
+		{
 			merge(v, w);
 			ret += c;
 			cont++;
@@ -165,7 +173,8 @@ int main()
 	sets = new int[numberOfVertices + 1];
 	initalizeSets();
 	costHeap = new edgeNode[numberOfEdges + 1];
-	for (int i = 1; i <= numberOfEdges; i++) {
+	for (int i = 1; i <= numberOfEdges; i++)
+	{
 		int v;
 		int w;
 		int c;
@@ -180,4 +189,3 @@ int main()
 	cout << cost;
 	return 0;
 }
-
