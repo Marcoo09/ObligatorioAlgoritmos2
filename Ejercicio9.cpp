@@ -50,26 +50,14 @@ nodeResult *add(nodeResult *currentNode, pii newNode)
     return currentNode;
 }
 
-void print(nodeResult *p)
-{
-    cout << "exec" << endl;
-    for (int i = 0; i < p->quantityOfElements; i++)
-    {
-        cout << "(" << p->result[i].first << "," << p->result[i].second << ")" << endl;
-    }
-}
-
 nodeResult *merge(nodeResult *left, nodeResult *right)
 {
     nodeResult *result = new nodeResult(left->quantityOfElements + right->quantityOfElements);
     int height1 = 0, height2 = 0;
-    // print(left);
-    // print(right);
     int i = 0;
     int j = 0;
     while (i < left->quantityOfElements && j < right->quantityOfElements)
     {
-        // cout << "i es: " << i << " j es: " << j << endl;
         if (left->result[i].first == right->result[j].first)
         {
             int position = left->result[i].first;
@@ -107,19 +95,12 @@ nodeResult *merge(nodeResult *left, nodeResult *right)
 
     while (i < left->quantityOfElements)
     {
-        // cout << "i es: " << i << endl;
-        // cout << right->result[i].first << "," << right->result[i].second << endl;
         result = add(result, left->result[i]);
         i++;
     }
     while (j < right->quantityOfElements)
     {
-        // cout << " j es: " << j << endl;
-        // cout << right->result[j].first << "," << right->result[j].second << endl;
         result = add(result, right->result[j]);
-        // cout << "imprimiendo result" << endl;
-        // print(result);
-        // cout << "terminde de imprimir result" << endl;
         j++;
     }
     return result;
@@ -132,30 +113,18 @@ nodeResult *getContours(node **shades, int left, int right)
     if (left == right)
     {
         nodeResult *result = new nodeResult(2);
-
-        // result->result[0].first = shades[left]->initialCoordinate;
-        // result->result[0].second = shades[left]->height;
-
         pii newNode1;
         newNode1.first = shades[left]->initialCoordinate;
         newNode1.second = shades[left]->height;
         result = add(result, newNode1);
-
-        // result->result[1].first = shades[left]->finalCoordinate;
-        // result->result[1].second = 0;
-
         pii newNode2;
         newNode2.first = shades[left]->finalCoordinate;
         newNode2.second = 0;
         result = add(result, newNode2);
-
-        // result->quantityOfElements++;
-        // result->quantityOfElements++;
         return result;
     }
     else
     {
-
         int middle = (right + left) / 2;
         l = getContours(shades, left, middle);
         r = getContours(shades, middle + 1, right);
