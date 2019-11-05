@@ -43,23 +43,34 @@ nodeResult *add(nodeResult *currentNode, pii newNode)
     if (currentNode->quantityOfElements > 0 && currentNode->result[currentNode->quantityOfElements - 1].first == newNode.first)
     {
         currentNode->result[currentNode->quantityOfElements - 1].second = currentNode->result[currentNode->quantityOfElements - 1].second > newNode.second ? currentNode->result[currentNode->quantityOfElements - 1].second : newNode.second;
-
         return currentNode;
     }
     currentNode->result[currentNode->quantityOfElements] = newNode;
     currentNode->quantityOfElements++;
+    return currentNode;
 }
 
-nodeResult *merge(nodeResult *left, nodeResult *right, int lenghtLeft, int lengthRight)
+nodeResult *merge(nodeResult *left, nodeResult *right)
 {
     nodeResult *result = new nodeResult(left->quantityOfElements + right->quantityOfElements);
     int height1 = 0, height2 = 0;
-
     int i = 0;
     int j = 0;
     while (i < left->quantityOfElements && j < right->quantityOfElements)
     {
-        if (left->result[i].first < right->result[j].first)
+        if (left->result[i].first == right->result[j].first)
+        {
+            int position = left->result[i].first;
+            height1 = left->result[i].second;
+            height2 = right->result[j].second;
+            pii newNode;
+            newNode.first = position;
+            newNode.second = height1;
+            result = add(result, newNode);
+            j++;
+            i++;
+        }
+        else if (left->result[i].first < right->result[j].first)
         {
 
             int leftPosition = left->result[i].first;
@@ -81,10 +92,10 @@ nodeResult *merge(nodeResult *left, nodeResult *right, int lenghtLeft, int lengt
             j++;
         }
     }
+
     while (i < left->quantityOfElements)
     {
         result = add(result, left->result[i]);
-
         i++;
     }
     while (j < right->quantityOfElements)
@@ -102,12 +113,14 @@ nodeResult *getContours(node **shades, int left, int right)
     if (left == right)
     {
         nodeResult *result = new nodeResult(2);
-        result->result[0].first = shades[left]->initialCoordinate;
-        result->result[0].second = shades[left]->height;
-        result->result[1].first = shades[left]->finalCoordinate;
-        result->result[1].second = 0;
-        result->quantityOfElements++;
-        result->quantityOfElements++;
+        pii newNode1;
+        newNode1.first = shades[left]->initialCoordinate;
+        newNode1.second = shades[left]->height;
+        result = add(result, newNode1);
+        pii newNode2;
+        newNode2.first = shades[left]->finalCoordinate;
+        newNode2.second = 0;
+        result = add(result, newNode2);
         return result;
     }
     else
@@ -115,7 +128,7 @@ nodeResult *getContours(node **shades, int left, int right)
         int middle = (right + left) / 2;
         l = getContours(shades, left, middle);
         r = getContours(shades, middle + 1, right);
-        return merge(l, r, middle - left + 1, right - middle);
+        return merge(l, r);
     }
 }
 
