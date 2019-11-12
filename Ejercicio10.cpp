@@ -7,109 +7,82 @@ int cases;
 int kFloorsToMove;
 int heightBuilding;
 int quantityOfFloorsAttended;
-//1 == O && 0 == C && -1 if atendido o atendió
-int *building;
+int* gang;
+int* operators;
 
-void initializeBuildingArray()
+void initializeArrays()
 {
-    building = new int[heightBuilding];
-    for (int i = 0; i < heightBuilding; i++)
-        building[i] = 0;
+	gang = new int[heightBuilding];
+	operators = new int[heightBuilding];
+	for (int i = 0; i < heightBuilding; i++) {
+		gang[i] = -1;
+		operators[i] = -1;
+	}
 }
 
-bool isFactible(int index)
-{
-    return index >= 0 && index < heightBuilding && building[index] == 0;
-}
-
-int getOptimumIndex(int i)
-{
-    int betterIndex = -1;
-    bool founded = false;
-    int k = kFloorsToMove;
-    while (k >= 1 && !founded)
-    {
-        if (isFactible(i + k))
-        {
-            betterIndex = i + k;
-            building[i + k] = -1;
-            founded = true;
-        }
-        else if (isFactible(i - k))
-        {
-            betterIndex = i - k;
-            building[i - k] = -1;
-            founded = true;
-        }
-        else
-        {
-            k--;
-        }
-    }
-    return betterIndex;
-}
 
 int getQuantityOfFloorsAttended()
 {
-    int returnedValue = 0;
-    for (int i = 0; i < heightBuilding; i++)
-    {
-        int currentValue = building[i];
-        //He/She is O
-        if (currentValue == 1)
-        {
-            int optimumIndex = getOptimumIndex(i);
-            if (optimumIndex != -1)
-            {
-                building[i] = -1;
-                returnedValue++;
-            }
-        }
-    }
-    return returnedValue;
+	int count = 0;
+	int index1 = 0;
+	int index2 = 0;
+	while (gang[index1] != -1 && operators[index2] != -1 && count < heightBuilding) {
+		if (abs(gang[index1] - operators[index2]) <= kFloorsToMove) {
+			count++;
+			index1++;
+			index2++;
+		}
+		else if (gang[index1]<=operators[index2]){
+			index1++;
+		}
+		else {
+			index2++;
+		}
+	}
+	return count;
 }
 
-void printArray()
-{
-    for (int i = 0; i < heightBuilding; i++)
-    {
-        cout << building[i] << " aa" << endl;
-    }
-}
 
 int main()
 {
-    cin >> cases;
-    for (int i = 0; i < cases; i++)
-    {
-        quantityOfFloorsAttended = 0;
-        cin >> kFloorsToMove;
-        cin >> heightBuilding;
-        initializeBuildingArray();
-        char c;
-        string line;
-        cin.ignore();
-        getline(cin, line);
-        // cout << "line " << line << endl;
-        istringstream iss(line);
-        int index = 0;
-        while (iss >> c)
-        {
-            if (c != ' ')
-            {
-                if (c == 'C')
-                {
-                    building[index] = 0;
-                }
-                else
-                {
-                    building[index] = 1;
-                }
-                index++;
-            }
-        }
-        quantityOfFloorsAttended = getQuantityOfFloorsAttended();
-        cout << quantityOfFloorsAttended << " " << endl;
-    }
-    return 0;
+	cin >> cases;
+	for (int i = 0; i < cases; i++)
+	{
+		quantityOfFloorsAttended = 0;
+		cin >> kFloorsToMove;
+		cin >> heightBuilding;
+		initializeArrays();
+		char c;
+		string line;
+		cin.ignore();
+		getline(cin, line);
+		// cout << "line " << line << endl;
+		istringstream iss(line);
+		int index1 = 0;
+		int res1 = 0;
+		int index2 = 0;
+		int res2 = 0;
+		while (iss >> c)
+		{
+			if (c != ' ')
+			{
+				if (c == 'C')
+				{
+					gang[index1] = res1;
+					index1++;
+
+				}
+				else
+				{
+					operators[index2] = res2;
+					index2++;
+				}
+				res2++;
+				res1++;
+			}
+		}
+		quantityOfFloorsAttended = getQuantityOfFloorsAttended();
+		cout << quantityOfFloorsAttended << " " << endl;
+	}
+	return 0;
 }
