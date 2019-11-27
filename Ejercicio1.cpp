@@ -35,7 +35,6 @@ void insertarEnAvl(nodo *&avl, int elemento)
 				break;
 			case 0:
 				avl->bal = -1;
-				varioAltura = false;
 				break;
 			case -1:
 				if (avl->izq->bal == -1)
@@ -68,7 +67,7 @@ void insertarEnAvl(nodo *&avl, int elemento)
 			}
 		}
 	}
-	else
+	else 
 	{
 		insertarEnAvl(avl->der, elemento);
 		if (varioAltura)
