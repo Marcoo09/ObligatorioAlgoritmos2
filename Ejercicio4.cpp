@@ -7,11 +7,16 @@ using namespace std;
 struct node
 {
     int data;
-    int distanceToOrigin;
     node *sig;
 };
 
-node **heap;
+struct heapNode
+{
+    int data;
+    int distanceToOrigen;
+};
+
+heapNode *heap;
 int top = 0;
 
 int fatherPosition(int pos)
@@ -29,7 +34,7 @@ int rightSonPosition(int pos)
     return pos * 2 + 1;
 }
 
-node *getMin()
+heapNode getMin()
 {
     return heap[ROOT];
 }
@@ -37,24 +42,6 @@ node *getMin()
 bool isLeaf(int pos)
 {
     return leftSonPosition(pos) > top;
-}
-
-int getMinSonPositionForData(int pos)
-{
-    int leftPos = leftSonPosition(pos);
-    int rightPos = rightSonPosition(pos);
-    if (rightPos > top)
-    {
-        return leftPos;
-    }
-    else if (heap[leftPos]->data > heap[rightPos]->data)
-    {
-        return rightPos;
-    }
-    else
-    {
-        return leftPos;
-    }
 }
 
 int getMinSonPositionForDistanceToOrigin(int pos)
@@ -65,62 +52,59 @@ int getMinSonPositionForDistanceToOrigin(int pos)
     {
         return leftPos;
     }
-    else if (heap[leftPos]->distanceToOrigin > heap[rightPos]->distanceToOrigin)
+    else if (heap[leftPos].distanceToOrigen > heap[rightPos].distanceToOrigen)
     {
         return rightPos;
     }
-    else
+    else if (heap[leftPos].distanceToOrigen < heap[rightPos].distanceToOrigen)
     {
         return leftPos;
     }
-}
-
-void sink(int pos)
-{
-    cout << "pos " << pos << endl;
-    if (!isLeaf(pos))
+    else
     {
-        cout << "no es hoja" << endl;
-        int sonPosition = getMinSonPositionForDistanceToOrigin(pos);
-        cout << "sonPosition " << sonPosition << endl;
-        if (heap[sonPosition] != NULL && heap[pos] != NULL)
+        if (heap[leftPos].data < heap[rightPos].data)
         {
-            cout << "entre al primer if " << endl;
-            if (heap[sonPosition]->distanceToOrigin < heap[pos]->distanceToOrigin)
-            {
-                cout << "entre  al if anidado" << endl;
-                swap(sonPosition, pos);
-                sink(sonPosition);
-            }
-            // else if (heap[sonPosition]->distanceToOrigin == heap[pos]->distanceToOrigin)
-            // {
-            //     cout << "entre al else if anidado" << endl;
-            //     if (heap[sonPosition]->data < heap[pos]->data)
-            //     {
-            //         cout << "entre al if dentro del else if" << endl;
-            //         swap(sonPosition, pos);
-            //         sink(sonPosition);
-            //     }
-            // }
-            cout << "no entre a ninguno" << endl;
+            return leftPos;
+        }
+        else
+        {
+            return rightPos;
         }
     }
 }
 
-void swap(int pos1, int pos2)
+void exchanges(int pos1, int pos2)
 {
-    node *mediumNode = heap[pos1];
+    heapNode mediumNode = heap[pos1];
     heap[pos1] = heap[pos2];
     heap[pos2] = mediumNode;
 }
 
+void sink(int pos)
+{
+    if (!isLeaf(pos))
+    {
+        int sonPosition = getMinSonPositionForDistanceToOrigin(pos);
+        if (heap[sonPosition].distanceToOrigen < heap[pos].distanceToOrigen)
+        {
+            exchanges(sonPosition, pos);
+            sink(sonPosition);
+        }
+        else if (heap[sonPosition].distanceToOrigen == heap[pos].distanceToOrigen)
+        {
+            if (heap[sonPosition].data < heap[pos].data)
+            {
+                exchanges(sonPosition, pos);
+                sink(sonPosition);
+            }
+        }
+    }
+}
+
 void deleteMin()
 {
-    node *min = heap[ROOT];
-    cout << "el min es " << min->data << endl;
     heap[ROOT] = heap[top];
     top--;
-    cout << "el top es " << top << endl;
     sink(ROOT);
 }
 
@@ -129,41 +113,27 @@ void floatUp(int pos)
     if (pos != ROOT)
     {
         int fatherPos = fatherPosition(pos);
-        if (heap[pos] != NULL && heap[fatherPos] != NULL)
+        if (heap[pos].distanceToOrigen < heap[fatherPos].distanceToOrigen)
         {
-            if (heap[pos]->distanceToOrigin < heap[fatherPos]->distanceToOrigin)
+            exchanges(pos, fatherPos);
+            floatUp(fatherPos);
+        }
+        else if ((heap[pos].distanceToOrigen) == (heap[fatherPos].distanceToOrigen))
+        {
+            if (heap[pos].data < heap[fatherPos].data)
             {
-                swap(pos, fatherPos);
+                exchanges(pos, fatherPos);
                 floatUp(fatherPos);
-            }
-            else if ((heap[pos]->distanceToOrigin) == (heap[fatherPos]->distanceToOrigin))
-            {
-                if (heap[pos]->data < heap[fatherPos]->data)
-                {
-                    swap(pos, fatherPos);
-                    floatUp(fatherPos);
-                }
             }
         }
     }
 }
 
-void enqeue(node *newNode)
+void enqeue(heapNode newNode)
 {
-    if (newNode != NULL)
-    {
-        top++;
-        heap[top] = newNode;
-        floatUp(top);
-    }
-}
-
-void printTopologicalOrder(int *result, int vertices)
-{
-    for (int i = 0; i < vertices; i++)
-    {
-        cout << result[i] << endl;
-    }
+    top++;
+    heap[top] = newNode;
+    floatUp(top);
 }
 
 int main()
@@ -174,19 +144,18 @@ int main()
     cin >> quantityOfEdges;
     node **graph = new node *[quantityOfVertices + 1];
     int *entryGrade = new int[quantityOfVertices + 1];
-    int *printArray = new int[quantityOfVertices + 1];
-    heap = new node *[quantityOfVertices + 1];
-    int cont = 1;
+    heap = new heapNode[quantityOfVertices + 1];
+    //int cont = 1;
     //Fill initialGrap
-    for (int i = 1; i <= quantityOfVertices; i++)
+    for (int i = 0; i <= quantityOfVertices; i++)
     {
         graph[i] = NULL;
     }
-    for (int i = 1; i <= quantityOfVertices; i++)
+    for (int i = 0; i <= quantityOfVertices; i++)
     {
         entryGrade[i] = 0;
-        printArray[i] = 0;
-        heap[i] = NULL;
+        heap[i].data = 0;
+        heap[i].distanceToOrigen = 0;
     }
     //Fill with data coming from file
     for (int i = 0; i < quantityOfEdges; i++)
@@ -197,7 +166,6 @@ int main()
         //Create the new node which represent the edge
         node *newNode = new node();
         newNode->data = edgeFinal;
-        newNode->distanceToOrigin = 0;
         newNode->sig = graph[verticeToInsert];
         //Insert the new edge in the vertice
         graph[verticeToInsert] = newNode;
@@ -207,38 +175,30 @@ int main()
     {
         if (entryGrade[j] == 0)
         {
-            cout << "el vertice " << j << " tiene grado 0" << endl;
-            node *newNode = new node();
-            newNode->data = j;
-            newNode->distanceToOrigin = 0;
-            newNode->sig = NULL;
+            heapNode newNode;
+            newNode.data = j;
+            newNode.distanceToOrigen = 0;
             enqeue(newNode);
         }
     }
     while (top != 0)
     {
-        cout << "entre " << endl;
-        int vertice = getMin()->data;
-        cout << "con vertice " << vertice << endl;
+        heapNode vertice = getMin();
         deleteMin();
-        cout << "borre el min " << endl;
-        printArray[cont] = vertice;
-        cont++;
-        cout << "cont" << cont << endl;
-        node *adjacent = graph[vertice];
+        cout << vertice.data << endl;
+        node *adjacent = graph[vertice.data];
+        heapNode toAdd;
         while (adjacent != NULL)
         {
-            cout << "recorro los adjacentes, estoy en " << adjacent->data << endl;
+            toAdd.data = adjacent->data;
             entryGrade[adjacent->data]--;
             if (entryGrade[adjacent->data] == 0)
             {
-                cout << "agrego el adyacente " << adjacent->data << " a la cola" << endl;
-                adjacent->distanceToOrigin = graph[vertice]->distanceToOrigin + 1;
-                enqeue(adjacent);
+                toAdd.distanceToOrigen = vertice.distanceToOrigen + 1;
+                enqeue(toAdd);
             }
             adjacent = adjacent->sig;
         }
     }
-    printTopologicalOrder(printArray, quantityOfVertices);
     return 0;
 }
