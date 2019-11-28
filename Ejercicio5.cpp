@@ -3,43 +3,42 @@
 #define RAIZ 1
 using namespace std;
 
-
-struct TablaDijkstra {
+struct TablaDijkstra
+{
 	bool conocido;
 	int anterior;
 	int costo;
 };
 
-struct Nodo {
+struct Nodo
+{
 	int vertice;
 	int costo;
 };
 
-struct nodoL {
+struct nodoL
+{
 	int vertice;
 	int costo;
-	nodoL* sig;
+	nodoL *sig;
 };
 
-Nodo* heap;
+Nodo *heap;
 int tope;
-TablaDijkstra* tablaDijkstra;
-int* hashing;
+TablaDijkstra *tablaDijkstra;
+int *hashing;
 
-
-
-void inicializarTabla(int cantVertices, int origen) {
+void inicializarTabla(int cantVertices, int origen)
+{
 	tablaDijkstra = new TablaDijkstra[cantVertices + 1];
-	for (int i = 1; i <= cantVertices; i++) {
+	for (int i = 1; i <= cantVertices; i++)
+	{
 		tablaDijkstra[i].conocido = false;
 		tablaDijkstra[i].costo = INF;
 		tablaDijkstra[i].anterior = -1;
 	}
 	tablaDijkstra[origen].costo = 0;
 }
-
-
-
 
 int posicionPadre(int pos)
 {
@@ -77,7 +76,6 @@ int obtenerPosMinimoHijo(int pos)
 	}
 }
 
-
 void intercambiar(int pos1, int pos2)
 {
 	Nodo intermedio = heap[pos1];
@@ -91,7 +89,7 @@ void flotar(int pos)
 	{
 		int posPadre = posicionPadre(pos);
 		{
-			
+
 			if (heap[pos].costo < heap[posPadre].costo)
 			{
 				hashing[heap[pos].vertice] = posPadre;
@@ -101,7 +99,6 @@ void flotar(int pos)
 			}
 		}
 	}
-
 }
 
 void insertarEnHeap(Nodo nuevo)
@@ -111,28 +108,29 @@ void insertarEnHeap(Nodo nuevo)
 	flotar(tope);
 }
 
-void inicializarHeap(int origen, int cantVertices) {
+void inicializarHeap(int origen, int cantVertices)
+{
 	heap = new Nodo[cantVertices + 1];
-	for (int i = 1; i <= cantVertices; i++) {
+	for (int i = 1; i <= cantVertices; i++)
+	{
 		Nodo nuevo;
 		nuevo.vertice = i;
-		if (i != origen) {
+		if (i != origen)
+		{
 			nuevo.costo = INF;
 		}
-		else {
+		else
+		{
 			nuevo.costo = 0;
 		}
 		insertarEnHeap(nuevo);
 	}
 }
 
-
 bool esHoja(int pos)
 {
 	return posicionHijoIzq(pos) > tope;
 }
-
-
 
 void hundir(int pos)
 {
@@ -157,24 +155,29 @@ void eliminarMinimo()
 	hundir(RAIZ);
 }
 
-void modificarCosto(int vertice, int nuevoCosto) {
+void modificarCosto(int vertice, int nuevoCosto)
+{
 	int indiceHeap = hashing[vertice];
 	heap[indiceHeap].costo = nuevoCosto;
 	hundir(indiceHeap);
 	flotar(indiceHeap);
 }
 
-
-void Dijkstra(nodoL** g, int cantVertices, int origen) {
+void Dijkstra(nodoL **g, int cantVertices, int origen)
+{
 	inicializarTabla(cantVertices, origen);
-	while (tope > 0) {
+	while (tope > 0)
+	{
 		Nodo min = heap[RAIZ];
 		eliminarMinimo();
 		tablaDijkstra[min.vertice].conocido = true;
-		nodoL* ady = g[min.vertice];
-		while (ady != NULL) {
-			if (!tablaDijkstra[ady->vertice].conocido) {
-				if (tablaDijkstra[ady->vertice].costo > tablaDijkstra[min.vertice].costo + ady->costo) {
+		nodoL *ady = g[min.vertice];
+		while (ady != NULL)
+		{
+			if (!tablaDijkstra[ady->vertice].conocido)
+			{
+				if (tablaDijkstra[ady->vertice].costo > tablaDijkstra[min.vertice].costo + ady->costo)
+				{
 					tablaDijkstra[ady->vertice].costo = tablaDijkstra[min.vertice].costo + ady->costo;
 					tablaDijkstra[ady->vertice].anterior = min.vertice;
 					modificarCosto(ady->vertice, tablaDijkstra[min.vertice].costo + ady->costo);
@@ -185,12 +188,16 @@ void Dijkstra(nodoL** g, int cantVertices, int origen) {
 	}
 }
 
-void imprimirTabla(int cantVertices) {
-	for (int i = 1; i <= cantVertices; i++) {
-		if (tablaDijkstra[i].costo == 0 || tablaDijkstra[i].costo == INF) {
+void imprimirTabla(int cantVertices)
+{
+	for (int i = 1; i <= cantVertices; i++)
+	{
+		if (tablaDijkstra[i].costo == 0 || tablaDijkstra[i].costo == INF)
+		{
 			cout << -1 << endl;
 		}
-		else {
+		else
+		{
 			cout << tablaDijkstra[i].costo << endl;
 		}
 	}
@@ -202,16 +209,19 @@ int main()
 	int cantAristas;
 	cin >> cantVertices;
 	cin >> cantAristas;
-	nodoL** grafo = new nodoL * [cantVertices + 1];
+	nodoL **grafo = new nodoL *[cantVertices + 1];
 	hashing = new int[cantVertices + 1];
-	for (int i = 0; i <= cantVertices; i++) hashing[i] = i;
-	for (int i = 0; i <= cantVertices; i++) grafo[i] = NULL;
-	for (int i = 0; i < cantAristas; i++) {
+	for (int i = 0; i <= cantVertices; i++)
+		hashing[i] = i;
+	for (int i = 0; i <= cantVertices; i++)
+		grafo[i] = NULL;
+	for (int i = 0; i < cantAristas; i++)
+	{
 		int v;
 		int w;
 		int costo;
 		cin >> v >> w >> costo;
-		nodoL* nuevoNodo = new nodoL();
+		nodoL *nuevoNodo = new nodoL();
 		nuevoNodo->vertice = w;
 		nuevoNodo->costo = costo;
 		nuevoNodo->sig = grafo[v];
@@ -219,13 +229,14 @@ int main()
 	}
 	int cantVerticesConsulta;
 	cin >> cantVerticesConsulta;
-	for (int i = 0; i < cantVerticesConsulta; i++) {
+	for (int i = 0; i < cantVerticesConsulta; i++)
+	{
 		int origen = 0;
 		cin >> origen;
 		inicializarHeap(origen, cantVertices);
 		Dijkstra(grafo, cantVertices, origen);
 		imprimirTabla(cantVertices);
-		for (int i = 0; i <= cantVertices; i++) hashing[i] = i;
+		for (int i = 0; i <= cantVertices; i++)
+			hashing[i] = i;
 	}
-
 }
