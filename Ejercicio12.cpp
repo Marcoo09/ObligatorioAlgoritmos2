@@ -24,7 +24,7 @@ void initializeMatrix(int n, int m)
     }
 }
 
-int isPossibleToDoTheSum(int n, int sum)
+void isPossibleToDoTheSum(int n, int sum)
 {
     for (int i = 1; i <= n; i++)
     {
@@ -40,7 +40,6 @@ int isPossibleToDoTheSum(int n, int sum)
             }
         }
     }
-    return matrix[n][sum] == true ? 1 : 0;
 }
 
 int main()
@@ -62,24 +61,22 @@ int main()
     cin >> quantityOfM;
     mSet = new int[quantityOfM];
     initializeMatrix(sizeOfSet, maxValue);
-
     for (int i = 0; i < quantityOfM; i++)
     {
         int m;
         cin >> m;
         mSet[i] = m;
     }
-
+    isPossibleToDoTheSum(sizeOfSet, maxValue);
     for (int i = 0; i < quantityOfM; i++)
     {
-        int isPossible = isPossibleToDoTheSum(sizeOfSet, mSet[i]);
         if (i == quantityOfM - 1)
         {
-            cout << isPossible;
+            cout << (matrix[sizeOfSet][mSet[i]] == true ? 1 : 0);
         }
         else
         {
-            cout << isPossible << endl;
+            cout << (matrix[sizeOfSet][mSet[i]] == true ? 1 : 0) << endl;
         }
     }
 
